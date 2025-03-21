@@ -40,6 +40,11 @@ public abstract class Container
     {
         return this.cargoMass + this.tareWeight;
     }
+
+    public string GetSerialNumber()
+    {
+        return this.serialNumber;
+    }
     
     public override string ToString()
         {
