@@ -1,30 +1,39 @@
-namespace ContainerLoadingSimulator;
+namespace ContainerLoadingSimulator.Containers;
 
 public class LiquidContainer : Container, IHazardNotifier
 {
-    private static int ContainerCounter = 1;
+    private static int _containerCounter = 1;
+    private bool isHazardous = false;
     public LiquidContainer(double height, double tareWeight, double depth, double maxPayload) : 
-        base(height, tareWeight, depth, "KON-L-" + ContainerCounter++, maxPayload) {}
+        base(height, tareWeight, depth, "KON-L-" + _containerCounter++, maxPayload) {}
 
     public string Notify()
     {
         return "Hazardous situation occurred in liquid container nr: " + serialNumber;
     }
 
-    public void Load(Liquid gas)
+    public override void Load(double productMass)
     {
-        if (gas.hazardous && cargoMass + gas.mass > maxPayload / 2)
+        Load(productMass, false);
+    }
+
+    public void Load(double productMass, bool isHazardous)
+    {
+        this.isHazardous = isHazardous;
+        double maxAllowedCapacity = isHazardous ? maxPayload * 0.5 : maxPayload * 0.9;
+        
+        if (cargoMass + productMass > maxAllowedCapacity)
         {
             Console.WriteLine(Notify());
-            throw new OverfillException("Loading aborted - hazardous cargo can occupy maximally 50% of the container capacity");
-        } 
-        else if (!gas.hazardous && cargoMass + gas.mass > maxPayload * 0.9)
-        {
-            throw new OverfillException("Loading aborted - regular liquid cargo can occupy maximally 90% of the container capacity");
+            throw new OverfillException(isHazardous 
+                ? "Loading aborted - hazardous cargo can occupy maximally 50% of the container capacity" 
+                : "Loading aborted - regular liquid cargo can occupy maximally 90% of the container capacity");
         }
-        else
-        {
-            cargoMass += gas.mass;
-        }
+        cargoMass += productMass;
+    }
+    
+    public override string ToString()
+    {
+        return base.ToString() + $", Hazardous={isHazardous}";
     }
 }

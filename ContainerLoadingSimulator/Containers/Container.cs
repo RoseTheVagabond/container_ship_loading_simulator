@@ -1,6 +1,6 @@
 namespace ContainerLoadingSimulator;
 
-public class Container
+public abstract class Container
 {
     protected double cargoMass { get; set; } = 0;
     protected double height { get; set; }
@@ -24,15 +24,15 @@ public class Container
         this.cargoMass = 0;
     }
 
-    public virtual void Load(Product product)
+    public virtual void Load(double productMass)
     {
-        if (this.cargoMass + product.mass > this.maxPayload)
+        if (this.cargoMass + productMass > this.maxPayload)
         {
             throw new OverfillException();
         }
         else
         {
-            this.cargoMass += product.mass;
+            this.cargoMass += productMass;
         }
     }
 
@@ -40,4 +40,10 @@ public class Container
     {
         return this.cargoMass + this.tareWeight;
     }
+    
+    public override string ToString()
+        {
+            return $"Container {serialNumber}: Height={height}cm, Depth={depth}cm, Tare Weight={tareWeight}kg, " +
+                   $"Cargo Mass={cargoMass}kg, Max Payload={maxPayload}kg, Total Weight={GetTotalWeight()}kg";
+        }
 }
