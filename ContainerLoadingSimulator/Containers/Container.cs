@@ -1,54 +1,54 @@
-namespace ContainerLoadingSimulator;
+namespace ContainerLoadingSimulator.Containers;
 
 public abstract class Container
 {
-    protected double cargoMass { get; set; } = 0;
-    protected double height { get; set; }
-    protected double tareWeight { get; set; }
-    protected double depth { get; set; }
-    protected string serialNumber { get; set; }
-    protected double maxPayload { get; set; }
+    protected double CargoMass { get; set; }
+    private double Height { get; set; }
+    private double TareWeight { get; set; }
+    private double Depth { get; set; }
+    protected string SerialNumber { get; set; }
+    protected double MaxPayload { get; set; }
 
     public Container(double height, double tareWeight, double depth,
         string serialNumber, double maxPayload)
     {
-        this.height = height;
-        this.tareWeight = tareWeight;
-        this.depth = depth;
-        this.serialNumber = serialNumber;
-        this.maxPayload = maxPayload;
+        this.Height = height;
+        this.TareWeight = tareWeight;
+        this.Depth = depth;
+        this.SerialNumber = serialNumber;
+        this.MaxPayload = maxPayload;
     }
 
     public virtual void Empty()
     {
-        this.cargoMass = 0;
+        this.CargoMass = 0;
     }
 
     public virtual void Load(double productMass)
     {
-        if (this.cargoMass + productMass > this.maxPayload)
+        if (this.CargoMass + productMass > this.MaxPayload)
         {
             throw new OverfillException();
         }
         else
         {
-            this.cargoMass += productMass;
+            this.CargoMass += productMass;
         }
     }
 
     public double GetTotalWeight()
     {
-        return this.cargoMass + this.tareWeight;
+        return this.CargoMass + this.TareWeight;
     }
 
     public string GetSerialNumber()
     {
-        return this.serialNumber;
+        return this.SerialNumber;
     }
     
     public override string ToString()
         {
-            return $"Container {serialNumber}: Height={height}cm, Depth={depth}cm, Tare Weight={tareWeight}kg, " +
-                   $"Cargo Mass={cargoMass}kg, Max Payload={maxPayload}kg, Total Weight={GetTotalWeight()}kg";
+            return $"Container {SerialNumber}: Height={Height}cm, Depth={Depth}cm, Tare Weight={TareWeight}kg, " +
+                   $"Cargo Mass={CargoMass}kg, Max Payload={MaxPayload}kg, Total Weight={GetTotalWeight()}kg";
         }
 }
