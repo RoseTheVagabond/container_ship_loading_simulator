@@ -21,9 +21,9 @@ public class RefrigeratedContainer : Container
         if (cargoMass > 0 && this.ProductType != productType)
         {
             Console.WriteLine($"Cannot mix product types. Container already contains {this.ProductType}");
-        } else if (Temperature < requiredTemperature)
+        } else if (Math.Abs(Temperature - requiredTemperature) > 0.25)
         {
-            Console.WriteLine($"Container {serialNumber} cannot store {productType}, because temperature is too low");
+            Console.WriteLine($"Container {serialNumber} cannot store {productType}, because temperature is wrong");
             Console.WriteLine($"Temperature in container: {this.Temperature}, temperature required: {requiredTemperature}");
         } else if (cargoMass + productMass > maxPayload)
         {

@@ -10,6 +10,8 @@ public class Ship
     public int MaximumContainers { get; set; }
     public double MaximumContainerWeightTons { get; set; }
     public double ContainerWeightTons { get; set; } = 0;
+    
+    private static Dictionary<string, Ship> containerShipMap = new Dictionary<string, Ship>();
 
     public Ship(double maximumSpeed, int maxContainers, double maxContainerWeightTons)
     {
@@ -21,6 +23,18 @@ public class Ship
 
     public bool Load(Container container)
     {
+        string serialNumber = container.GetSerialNumber();
+        
+        if (containerShipMap.ContainsKey(serialNumber))
+        {
+            Ship currentShip = containerShipMap[serialNumber];
+            if (currentShip != this)
+            {
+                Console.WriteLine($"Can't load container {serialNumber}. It's already on Ship {currentShip.ShipNumber}.");
+                return false;
+            }
+        }
+        
         if (ContainerWeightTons + (container.GetTotalWeight() * 0.001) > MaximumContainerWeightTons)
         {
             Console.WriteLine("Can't load another container with a total weight of " + container.GetTotalWeight() + ".");
@@ -31,8 +45,12 @@ public class Ship
             Console.WriteLine("Can't load another container, because the maximum number of containers has been reached.");
             return false;
         }
+        
         Containers.Add(container);
         ContainerWeightTons += container.GetTotalWeight() * 0.001;
+        containerShipMap[serialNumber] = this;
+        
+        Console.WriteLine($"Container {serialNumber} loaded onto Ship {ShipNumber}");
         return true;
     }
     
@@ -43,6 +61,12 @@ public class Ship
         {
             Containers.Remove(containerToRemove);
             ContainerWeightTons -= containerToRemove.GetTotalWeight() * 0.001;
+            
+            if (containerShipMap.ContainsKey(serialNumber))
+            {
+                containerShipMap.Remove(serialNumber);
+            }
+            
             Console.WriteLine($"Container {serialNumber} removed from ship {ShipNumber}");
             return true;
         }
@@ -52,8 +76,18 @@ public class Ship
     
     public void ReplaceContainer(string serialNumberOld, Container newContainer)
     {
-        RemoveContainer(serialNumberOld);
-        Load(newContainer);
+        string newSerialNumber = newContainer.GetSerialNumber();
+        if (containerShipMap.ContainsKey(newSerialNumber) && containerShipMap[newSerialNumber] != this)
+        {
+            Ship currentShip = containerShipMap[newSerialNumber];
+            Console.WriteLine($"Can't replace with container {newSerialNumber}. It's already on Ship {currentShip.ShipNumber}.");
+            return;
+        }
+        
+        if (RemoveContainer(serialNumberOld))
+        {
+            Load(newContainer);
+        }
     }
     
     public bool TransferContainer(string serialNumber, Ship destinationShip)
@@ -61,14 +95,27 @@ public class Ship
         Container containerToTransfer = Containers.Find(c => c.GetSerialNumber() == serialNumber);
         if (containerToTransfer != null)
         {
+            Containers.Remove(containerToTransfer);
+            ContainerWeightTons -= containerToTransfer.GetTotalWeight() * 0.001;
+            if (containerShipMap.ContainsKey(serialNumber))
+            {
+                containerShipMap.Remove(serialNumber);
+            }
+            
             if (destinationShip.Load(containerToTransfer))
             {
-                Containers.Remove(containerToTransfer);
                 Console.WriteLine($"Container {serialNumber} transferred from ship {ShipNumber} to ship {destinationShip.ShipNumber}");
                 return true;
             }
-            Console.WriteLine($"Failed to transfer container {serialNumber} to ship {destinationShip.ShipNumber}");
-            return false;
+            else
+            {
+                Containers.Add(containerToTransfer);
+                ContainerWeightTons += containerToTransfer.GetTotalWeight() * 0.001;
+                containerShipMap[serialNumber] = this;
+                
+                Console.WriteLine($"Failed to transfer container {serialNumber} to ship {destinationShip.ShipNumber}");
+                return false;
+            }
         }
         Console.WriteLine($"Container {serialNumber} not found on ship {ShipNumber}");
         return false;
@@ -76,6 +123,7 @@ public class Ship
     
     public void PrintShipInfo()
     {
+        Console.WriteLine($"Ship {ShipNumber} Information:");
         Console.WriteLine($"Max Speed: {MaximumSpeed} knots");
         Console.WriteLine($"Number of Containers: {Containers.Count}");
         Console.WriteLine($"Max Container Capacity: {MaximumContainers}");
@@ -95,5 +143,4 @@ public class Ship
             Console.WriteLine("No containers on board.");
         }
     }
-    
 }
