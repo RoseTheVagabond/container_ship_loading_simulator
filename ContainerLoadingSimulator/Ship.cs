@@ -79,8 +79,8 @@ public class Ship
         Console.WriteLine($"Max Speed: {MaximumSpeed} knots");
         Console.WriteLine($"Number of Containers: {Containers.Count}");
         Console.WriteLine($"Max Container Capacity: {MaximumContainers}");
-        Console.WriteLine($"Total Weight of containers in tons: {ContainerWeightTons} tons");
-        Console.WriteLine($"Max allowed Container Weight: {MaximumContainerWeightTons}");
+        Console.WriteLine($"Total Weight of containers in tons: {ContainerWeightTons:F3} tons");
+        Console.WriteLine($"Max allowed Container Weight: {MaximumContainerWeightTons} tons");
         
         if (Containers.Count > 0)
         {

@@ -20,22 +20,20 @@ public class RefrigeratedContainer : Container
     {
         if (cargoMass > 0 && this.ProductType != productType)
         {
-            throw new InvalidOperationException($"Cannot mix product types. Container already contains {this.ProductType}");
-        }
-        
-        if (Temperature < requiredTemperature)
+            Console.WriteLine($"Cannot mix product types. Container already contains {this.ProductType}");
+        } else if (Temperature < requiredTemperature)
         {
             Console.WriteLine($"Container {serialNumber} cannot store {productType}, because temperature is too low");
             Console.WriteLine($"Temperature in container: {this.Temperature}, temperature required: {requiredTemperature}");
-            throw new InvalidOperationException("Temperature requirements not met");
-        }
-        
-        if (cargoMass + productMass > maxPayload)
+        } else if (cargoMass + productMass > maxPayload)
         {
-            throw new OverfillException($"Cannot load {productType}: maximum payload exceeded");
+            Console.WriteLine($"Cannot load {productType}: maximum payload exceeded");
         }
-        cargoMass += productMass;
-        this.ProductType = productType;
+        else
+        {
+            cargoMass += productMass;
+            this.ProductType = productType;
+        }
     }
     
     public override string ToString()
